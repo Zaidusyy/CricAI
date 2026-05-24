@@ -28,78 +28,118 @@ export const quickMatches = [
 export const getDemoData = (query: string) => {
   const lowercaseQuery = query.toLowerCase();
 
-  if (lowercaseQuery.includes("rohit") || lowercaseQuery.includes("sharma")) {
-    return {
-      type: "player",
-      name: "Rohit Sharma",
-      role: "Opening Batter",
-      team: "Mumbai Indians",
-      recentForm: "Matches: 5, Runs: 215, Strike Rate: 148.5, Fifties: 2",
-      headToHead: "vs RR: 350 runs in 15 innings at SR 135.",
-      pitchConditions: "Wankhede Stadium: Flat track, true bounce, excellent for stroke play.",
-    };
-  }
-
-  if (lowercaseQuery.includes("bumrah")) {
-    return {
-      type: "player",
-      name: "Jasprit Bumrah",
-      role: "Fast Bowler",
-      team: "Mumbai Indians",
-      recentForm: "Matches: 5, Wickets: 12, Economy: 6.2, Best: 4/15",
-      headToHead: "vs RR: 18 wickets in 12 matches, avg 15.4.",
-      pitchConditions: "Wankhede Stadium: Good bounce, pace bowlers get early assistance.",
-    };
-  }
-
-  if (lowercaseQuery.includes("sanju") || lowercaseQuery.includes("samson")) {
-    return {
-      type: "player",
-      name: "Sanju Samson",
-      role: "Wicketkeeper Batter",
-      team: "Rajasthan Royals",
-      recentForm: "Matches: 5, Runs: 180, Strike Rate: 155.0, Fifties: 1",
-      headToHead: "vs MI: 280 runs in 14 innings, highest score 74*.",
-      pitchConditions: "Sawai Mansingh Stadium: Spin friendly, slow outfield.",
-    };
-  }
-
-  if (lowercaseQuery.includes("csk") || lowercaseQuery.includes("rcb")) {
+  // Match Preview Data
+  if (lowercaseQuery.includes("mi vs rr") || lowercaseQuery.includes("mumbai") || lowercaseQuery.includes("rajasthan")) {
     return {
       type: "match",
-      match: "CSK vs RCB",
-      date: "May 22 2026",
-      teams: "Chennai Super Kings vs Royal Challengers Bangalore",
-      recentForm: "CSK: W, W, L, W, W | RCB: L, L, W, L, W",
-      headToHead: "Overall: CSK 21 - 10 RCB.",
-      pitchConditions: "Chepauk Stadium: Spin friendly, slow track. Average 1st innings score: 165.",
-      keyPlayers: "CSK: Ruturaj Gaikwad, Ravindra Jadeja | RCB: Virat Kohli, Glenn Maxwell",
-      result: "CSK won by 6 wickets. Gaikwad scored 85*."
-    };
-  }
-  
-  if (lowercaseQuery.includes("kkr") || lowercaseQuery.includes("srh")) {
-    return {
-      type: "match",
-      match: "KKR vs SRH",
-      date: "May 25 2026",
-      teams: "Kolkata Knight Riders vs Sunrisers Hyderabad",
-      recentForm: "KKR: W, L, L, W, W | SRH: W, W, W, L, L",
-      headToHead: "Overall: KKR 16 - 9 SRH.",
-      pitchConditions: "Eden Gardens: Good batting deck with some assistance for pacers under lights. Average 1st innings score: 195.",
-      keyPlayers: "KKR: Shreyas Iyer, Sunil Narine | SRH: Pat Cummins, Travis Head"
+      match: "MI vs RR",
+      date: "May 24 2026",
+      teams: "Mumbai Indians vs Rajasthan Royals",
+      recentForm: "MI: W, L, W, W, L | RR: L, W, W, L, W",
+      headToHead: "Overall: MI 15 - 13 RR. Last 5 matches: MI 3 - 2 RR.",
+      pitchConditions: "Wankhede Stadium: High scoring ground, chasing is preferred. Average 1st innings score: 185.",
+      keyPlayers: "MI: Rohit Sharma, Jasprit Bumrah | RR: Sanju Samson, Trent Boult"
     };
   }
 
-  // Default to MI vs RR (Today)
+  // Fallback
   return {
     type: "match",
-    match: "MI vs RR",
-    date: "May 24 2026",
-    teams: "Mumbai Indians vs Rajasthan Royals",
-    recentForm: "MI: W, L, W, W, L | RR: L, W, W, L, W",
-    headToHead: "Overall: MI 15 - 13 RR. Last 5 matches: MI 3 - 2 RR.",
-    pitchConditions: "Wankhede Stadium: High scoring ground, chasing is preferred. Average 1st innings score: 185.",
-    keyPlayers: "MI: Rohit Sharma, Jasprit Bumrah | RR: Sanju Samson, Trent Boult"
+    match: "CSK vs RCB",
+    date: "May 22 2026",
+    teams: "Chennai Super Kings vs Royal Challengers Bangalore",
+    recentForm: "CSK: W, W, L, W, W | RCB: L, L, W, L, W",
+    headToHead: "Overall: CSK 21 - 10 RCB.",
+    pitchConditions: "Chepauk Stadium: Spin friendly, slow track. Average 1st innings score: 165.",
+    keyPlayers: "CSK: Ruturaj Gaikwad, Ravindra Jadeja | RCB: Virat Kohli, Glenn Maxwell",
+  };
+};
+
+// V3 Head to Head Data
+export const getDemoH2HData = (player1: string, player2: string) => {
+  const p1 = player1.toLowerCase();
+  const p2 = player2.toLowerCase();
+
+  if (
+    (p1.includes("rohit") || p1.includes("sharma")) && 
+    (p2.includes("sanju") || p2.includes("samson"))
+  ) {
+    return {
+      player1: {
+        name: "Rohit Sharma",
+        role: "Opening Batter",
+        stats: { matches: 254, runs: 6522, strikeRate: 131.2, average: 29.8, highest: "109*" }
+      },
+      player2: {
+        name: "Sanju Samson",
+        role: "Wicketkeeper Batter",
+        stats: { matches: 162, runs: 4120, strikeRate: 137.5, average: 30.5, highest: "119" }
+      },
+      aiVerdict: "While Rohit brings unparalleled experience and big-match temperament, Sanju currently holds a slight edge in raw strike rate in the middle overs. Expect fireworks from both."
+    };
+  }
+
+  if (
+    (p1.includes("jasprit") || p1.includes("bumrah")) && 
+    (p2.includes("trent") || p2.includes("boult"))
+  ) {
+    return {
+      player1: {
+        name: "Jasprit Bumrah",
+        role: "Fast Bowler",
+        stats: { matches: 135, wickets: 162, economy: 7.3, average: 22.8, best: "5/10" }
+      },
+      player2: {
+        name: "Trent Boult",
+        role: "Fast Bowler",
+        stats: { matches: 98, wickets: 115, economy: 8.1, average: 25.4, best: "4/18" }
+      },
+      aiVerdict: "Boult is statistically more lethal in the powerplay with the swinging ball, but Bumrah's exceptional economy and death-bowling yorkers make him the ultimate match-winner."
+    };
+  }
+
+  // Generic fallback
+  return {
+    player1: {
+      name: player1 || "Player A",
+      role: "Batter",
+      stats: { matches: 100, runs: 3000, strikeRate: 135.0, average: 30.0, highest: "100*" }
+    },
+    player2: {
+      name: player2 || "Player B",
+      role: "Bowler",
+      stats: { matches: 100, wickets: 120, economy: 7.5, average: 24.0, best: "4/20" }
+    },
+    aiVerdict: `An intriguing matchup between ${player1 || "Player A"} and ${player2 || "Player B"}. Both have significant match-winning potential.`
+  };
+};
+
+// V3 Match Predictor Data
+export const getDemoPredictorData = (match: string) => {
+  const m = match.toLowerCase();
+  
+  if (m.includes("mi") || m.includes("rr") || m.includes("mumbai")) {
+    return {
+      matchTitle: "MI vs RR - May 24, Wankhede",
+      team1: { name: "Mumbai Indians", probability: 61, color: "#004BA0" },
+      team2: { name: "Rajasthan Royals", probability: 39, color: "#EA1A85" },
+      reasoning: [
+        "MI's phenomenal record at Wankhede gives them a massive home advantage.",
+        "Jasprit Bumrah's exceptional form poses a huge threat to RR's top order.",
+        "RR has struggled slightly in high-scoring chases on flat tracks recently."
+      ]
+    };
+  }
+
+  // Fallback
+  return {
+    matchTitle: "CSK vs RCB - Chepauk",
+    team1: { name: "Chennai Super Kings", probability: 55, color: "#FFFF3C" },
+    team2: { name: "Royal Challengers", probability: 45, color: "#EC1C24" },
+    reasoning: [
+      "CSK's spin attack is tailor-made for the slow Chepauk surface.",
+      "RCB's top heavy batting line-up could struggle if they lose early wickets.",
+      "MS Dhoni's tactical brilliance on home turf is unparalleled."
+    ]
   };
 };

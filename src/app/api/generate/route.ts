@@ -1,25 +1,26 @@
-import { getDemoData } from "@/lib/demoData";
+import { fetchMatchData } from "@/lib/cricData";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { query } = await request.json();
+    const { query, isPostMatch } = await request.json();
 
     if (!query) {
       return NextResponse.json({ error: "Query is required" }, { status: 400 });
     }
 
-    // Step 1: Research Agent (Fetch Stats)
-    const statsData = getDemoData(query);
+    // Step 1: Research Agent (Fetch Stats from Real Data Layer)
+    const statsData = await fetchMatchData(query);
+    const sourceLabel = statsData.source === "Demo Mode" ? "[DEMO MODE - Data is illustrative]" : "[Real Data Fetched]";
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === "your_gemini_api_key_here") {
-      // Return a simulated response if API key is not set to prevent crashing demo
       return NextResponse.json({
-        article: `[DEMO MODE - API KEY REQUIRED] This is a demo article for ${query}. Since no valid Gemini API key was provided, this is placeholder text. To see the AI in action, please add your key to the .env file.\n\nStats used: ${JSON.stringify(statsData)}`,
-        twitter: `[DEMO MODE] 🏏 Exciting match ahead for ${query}! #Cricket #Demo\n\nStats: ${statsData.recentForm || statsData.headToHead}`,
-        instagram: `[DEMO MODE] Get ready for ${query}! 🏆🔥\n\n${statsData.pitchConditions || statsData.recentForm}\n\n#Cricket #IPL2026 #CricketFans`
+        article: `${sourceLabel} This is a demo article for ${query}. Please add your Gemini API key.\n\nStats: ${JSON.stringify(statsData)}`,
+        twitter: `${sourceLabel} 🏏 Exciting match for ${query}! #Cricket`,
+        instagram: `${sourceLabel} Get ready for ${query}! 🏆🔥`,
+        meme: `Imagine a picture of ${query} looking confused. Text: When the API key is missing.`
       });
     }
 
@@ -27,52 +28,54 @@ export async function POST(request: Request) {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Step 2: Writer Agent
+    const modeInstruction = isPostMatch 
+      ? "Write a POST-MATCH analysis. Focus on the turning point, top performer ratings out of 10, and a summary of the result."
+      : "Write a MATCH PREVIEW. Focus on pitch conditions, key matchups, and predicted X-factors.";
+
     const writerPrompt = `
     You are an expert sports journalist and cricket analyst. 
-    Write content based on the following stats for: ${query}
-    Stats Data: ${JSON.stringify(statsData)}
+    ${modeInstruction}
+    Based heavily on the following REAL context/stats for: ${query}
+    Context Data: ${JSON.stringify(statsData)}
 
-    Please generate exactly three formats of content. Do NOT include any introductory or concluding text, just output the content in the following strict JSON format:
+    CRITICAL RULE: You MUST inject actual context from the data into the text.
+
+    Please generate exactly four formats of content. Do NOT include any introductory text. Output strict JSON:
     {
-      "article": "A full match preview/analysis article (500-800 words).",
-      "twitter": "A Twitter/X thread (8-10 tweets) formatted with numbers, hashtags, and emojis.",
-      "instagram": "An Instagram caption (around 150 words) with emojis and relevant hashtags."
+      "article": "A full analysis (500-800 words). MUST include a 'Sources' section at the bottom citing the data.",
+      "twitter": "A Twitter thread (8-10 tweets) formatted with numbers, hashtags, and emojis.",
+      "instagram": "An Instagram caption (around 150 words) with emojis.",
+      "meme": "A hilarious, highly descriptive text idea for a cricket meme based on this match/player. Describe the image and the text overlays."
     }
-    Make sure the response is a valid JSON object.
     `;
 
     const writerResponse = await model.generateContent(writerPrompt);
     const writerText = writerResponse.response.text();
     
-    // Parse the writer response
     let draftContent;
     try {
-      // Find the JSON block if it's wrapped in markdown
       const jsonMatch = writerText.match(/```json\n([\s\S]*)\n```/);
       const jsonString = jsonMatch ? jsonMatch[1] : writerText;
       draftContent = JSON.parse(jsonString);
     } catch (e) {
-      console.error("Failed to parse writer output:", writerText);
-      draftContent = {
-        article: "Error generating article draft.",
-        twitter: "Error generating twitter draft.",
-        instagram: "Error generating instagram draft."
-      };
+      draftContent = { article: "Error", twitter: "Error", instagram: "Error" };
     }
 
     // Step 3: Editor Agent
     const editorPrompt = `
-    You are a senior sports editor. Review the following draft content for accuracy, tone, and readability.
-    Ensure the cricket facts are correct, the tone is engaging, and the formatting is perfect for publishing.
+    You are a senior sports editor. Review this draft content.
+    Ensure facts match the original stats: ${JSON.stringify(statsData)}.
+    Ensure the article has a Sources section.
     
     Draft Content:
     ${JSON.stringify(draftContent)}
     
-    Provide the final polished content in the following strict JSON format without any markdown blocks or extra text:
+    Output strict JSON without markdown blocks:
     {
-      "article": "Polished article text.",
-      "twitter": "Polished twitter thread text.",
-      "instagram": "Polished instagram caption text."
+      "article": "Polished article.",
+      "twitter": "Polished twitter.",
+      "instagram": "Polished instagram.",
+      "meme": "Polished meme idea."
     }
     `;
 
@@ -85,14 +88,17 @@ export async function POST(request: Request) {
       const jsonMatch = editorText.match(/```json\n([\s\S]*)\n```/);
       const jsonString = jsonMatch ? jsonMatch[1] : editorText;
       finalContent = JSON.parse(jsonString);
+      
+      // Append Demo Mode badge to article if applicable
+      if (statsData.source === "Demo Mode") {
+        finalContent.article = `**[DEMO MODE] Data used is illustrative.**\n\n` + finalContent.article;
+      }
     } catch (e) {
-      console.error("Failed to parse editor output, falling back to draft:", editorText);
       finalContent = draftContent;
     }
 
     return NextResponse.json(finalContent);
   } catch (error: any) {
-    console.error("Error in generate API:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
