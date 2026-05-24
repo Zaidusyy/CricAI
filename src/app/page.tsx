@@ -90,7 +90,7 @@ export default function Home() {
     const element = document.createElement("a");
     const file = new Blob([output[activeTab]], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = \`cricai-\${activeTab}-\${new Date().getTime()}.txt\`;
+    element.download = `cricai-${activeTab}-${new Date().getTime()}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -217,16 +217,16 @@ export default function Home() {
                       className="flex gap-4"
                     >
                       <div className="relative flex flex-col items-center">
-                        <div className={\`w-4 h-4 rounded-full border-2 flex items-center justify-center \${isDone ? "bg-emerald-500 border-emerald-500" : isActive ? "bg-transparent border-emerald-400" : "bg-neutral-800 border-neutral-700"}\`}>
+                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isDone ? "bg-emerald-500 border-emerald-500" : isActive ? "bg-transparent border-emerald-400" : "bg-neutral-800 border-neutral-700"}`}>
                           {isActive && <div className="w-2 h-2 bg-emerald-400 rounded-full animate-ping" />}
                           {isDone && <Check className="w-3 h-3 text-black" />}
                         </div>
                         {index < AGENTS.length - 1 && (
-                          <div className={\`w-0.5 h-full mt-2 rounded-full \${isDone ? "bg-emerald-500/50" : "bg-white/5"}\`}></div>
+                          <div className={`w-0.5 h-full mt-2 rounded-full ${isDone ? "bg-emerald-500/50" : "bg-white/5"}`}></div>
                         )}
                       </div>
                       <div className="pb-4 pt-0.5">
-                        <p className={\`font-semibold \${isDone || isActive ? "text-white" : "text-neutral-500"}\`}>{agent.name}</p>
+                        <p className={`font-semibold ${isDone || isActive ? "text-white" : "text-neutral-500"}`}>{agent.name}</p>
                         <p className="text-sm text-neutral-400 mt-1">
                           {isDone ? "Completed" : isActive ? agent.action : "Waiting in queue..."}
                         </p>
@@ -254,21 +254,21 @@ export default function Home() {
                 <div className="flex border-b border-white/10 bg-black/40">
                   <button
                     onClick={() => setActiveTab("article")}
-                    className={\`flex-1 py-4 px-4 flex justify-center items-center gap-2 font-semibold transition-all \${activeTab === "article" ? "text-emerald-400 border-b-2 border-emerald-400 bg-emerald-400/10" : "text-neutral-400 hover:text-white hover:bg-white/5"}\`}
+                    className={`flex-1 py-4 px-4 flex justify-center items-center gap-2 font-semibold transition-all ${activeTab === "article" ? "text-emerald-400 border-b-2 border-emerald-400 bg-emerald-400/10" : "text-neutral-400 hover:text-white hover:bg-white/5"}`}
                   >
                     <FileText className="w-4 h-4" />
                     Article
                   </button>
                   <button
                     onClick={() => setActiveTab("twitter")}
-                    className={\`flex-1 py-4 px-4 flex justify-center items-center gap-2 font-semibold transition-all \${activeTab === "twitter" ? "text-emerald-400 border-b-2 border-emerald-400 bg-emerald-400/10" : "text-neutral-400 hover:text-white hover:bg-white/5"}\`}
+                    className={`flex-1 py-4 px-4 flex justify-center items-center gap-2 font-semibold transition-all ${activeTab === "twitter" ? "text-emerald-400 border-b-2 border-emerald-400 bg-emerald-400/10" : "text-neutral-400 hover:text-white hover:bg-white/5"}`}
                   >
                     <Hash className="w-4 h-4" />
                     Twitter Thread
                   </button>
                   <button
                     onClick={() => setActiveTab("instagram")}
-                    className={\`flex-1 py-4 px-4 flex justify-center items-center gap-2 font-semibold transition-all \${activeTab === "instagram" ? "text-emerald-400 border-b-2 border-emerald-400 bg-emerald-400/10" : "text-neutral-400 hover:text-white hover:bg-white/5"}\`}
+                    className={`flex-1 py-4 px-4 flex justify-center items-center gap-2 font-semibold transition-all ${activeTab === "instagram" ? "text-emerald-400 border-b-2 border-emerald-400 bg-emerald-400/10" : "text-neutral-400 hover:text-white hover:bg-white/5"}`}
                   >
                     <ImageIcon className="w-4 h-4" />
                     Instagram Post
